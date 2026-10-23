@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagnostics - MediCore Pro</title>
+  <link rel="stylesheet" href="tests.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">🏥 MediCorePro</a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="patients.html">Patients</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="visits.html">Visits</a>
+        <a href="tests.html" class="active">Diagnostics</a>
+        <a href="billing.html">Billing</a>
+        <a href="reports.html">Reports</a>
+        <a href="ai-chat.html">AI Chat</a>
+        <button class="btn-sample" onclick="generateSampleData()">Load Sample Data</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <h1 class="page-title">Diagnostic & Lab Records</h1>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Test ID</th>
+            <th>Date</th>
+            <th>Patient Name</th>
+            <th>Test Procedure</th>
+            <th>Result Status</th>
+          </tr>
+        </thead>
+        <tbody id="test-table-body">
+          <tr><td colspan="5" style="text-align: center; color: #6b7280;">No diagnostic records found. Load sample data.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const db = loadDB();
+      const tbody = document.getElementById('test-table-body');
+      if (db.tests.length > 0) {
+        tbody.innerHTML = db.tests.map(t => `
+          <tr>
+            <td style="font-weight: 600;">${t.id}</td>
+            <td>${t.date}</td>
+            <td>${t.patient}</td>
+            <td>${t.testName}</td>
+            <td><span style="background: ${t.result.includes('Normal') ? '#f0fdf4' : '#fef2f2'}; color: ${t.result.includes('Normal') ? '#16a34a' : '#dc2626'}; padding: 4px 8px; border-radius: 4px; font-weight: 500;">${t.result}</span></td>
+          </tr>
+        `).join('');
+      }
+    });
+  </script>
+</body>
+</html>

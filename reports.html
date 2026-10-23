@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reports - MediCore Pro</title>
+  <link rel="stylesheet" href="reports.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">MediCore<span>Pro</span></a>
+      <nav>
+        <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a>
+        <a href="patients.html">Patients</a><a href="doctors.html">Doctors</a>
+        <a href="visits.html">Visits</a><a href="tests.html">Diagnostics</a>
+        <a href="billing.html">Billing</a><a href="reports.html" class="active">Reports</a>
+        <a href="ai-chat.html">AI Chat</a>
+        <button class="btn-sample" type="button" onclick="generateSampleData(); location.reload();">Load Sample Data</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-heading">
+      <div><h1 class="page-title">Hospital Reports</h1><p>A quick operational summary from your local records.</p></div>
+      <button class="btn" type="button" id="refresh-report">Refresh Report</button>
+    </div>
+    <section class="grid-cards" aria-label="Report summary">
+      <article class="card"><p>Patients</p><h2 id="report-patients">0</h2></article>
+      <article class="card"><p>Visits</p><h2 id="report-visits">0</h2></article>
+      <article class="card"><p>Diagnostic tests</p><h2 id="report-tests">0</h2></article>
+      <article class="card"><p>Recorded payments</p><h2 id="report-revenue">$0.00</h2></article>
+    </section>
+    <section class="card report-panel">
+      <h2>Visits by status</h2>
+      <div id="status-report" class="report-list"></div>
+      <p id="report-updated" class="muted"></p>
+    </section>
+    <button class="btn" type="button" id="download-report">Download CSV</button>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    let currentReport = {};
+    const formatMoney = amount => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(amount) || 0);
+    function makeReport() {
+      const db = loadDB();
+      const patients = Array.isArray(db.patients) ? db.patients : [];
+      const doctors = Array.isArray(db.doctors) ? db.doctors : [];
+      const visits = Array.isArray(db.visits) ? db.visits : [];
+      const tests = Array.isArray(db.tests) ? db.tests : [];
+      const payments = Array.isArray(db.payments) ? db.payments : (Array.isArray(db.billing) ? db.billing : []);
+      const revenue = payments.reduce((sum, item) => sum + Number(item.amount || item.total || 0), 0);
+      const statusCounts = visits.reduce((counts, visit) => {
+        const status = visit.status || 'Unspecified';
+        counts[status] = (counts[status] || 0) + 1;
+        return counts;
+      }, {});
+      currentReport = { patients, doctors, visits, tests, payments, revenue, statusCounts };
+      document.getElementById('report-patients').textContent = patients.length;
+      document.getElementById('report-visits').textContent = visits.length;
+      document.getElementById('report-tests').textContent = tests.length;
+      document.getElementById('report-revenue').textContent = formatMoney(revenue);
+      const entries = Object.entries(statusCounts);
+      document.getElementById('status-report').innerHTML = entries.length
+        ? entries.map(([status, count]) => `<div class="report-row"><span>${escapeText(status)}</span><strong>${count}</strong></div>`).join('')
+        : '<p>No visit records available yet.</p>';
+      document.getElementById('report-updated').textContent = `Updated ${new Date().toLocaleString()}`;
+    }
+    function escapeText(value) {
+      return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    }
+    function downloadCSV() {
+      if (!currentReport.patients) makeReport();
+      const rows = [
+        ['MediCore Pro Report', 'Value'],
+        ['Patients', currentReport.patients.length],
+        ['Doctors', currentReport.doctors.length],
+        ['Visits', currentReport.visits.length],
+        ['Diagnostic tests', currentReport.tests.length],
+        ['Recorded payments', currentReport.payments.length],
+        ['Payment total', currentReport.revenue.toFixed(2)],
+        ...Object.entries(currentReport.statusCounts).map(([status, count]) => [`Visits - ${status}`, count])
+      ];
+      const csv = rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      link.download = 'medicore-report.csv'; link.click(); URL.revokeObjectURL(link.href);
+    }
+    document.getElementById('refresh-report').addEventListener('click', makeReport);
+    document.getElementById('download-report').addEventListener('click', downloadCSV);
+    document.addEventListener('DOMContentLoaded', makeReport);
+  </script>
+</body>
+</html>

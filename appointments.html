@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appointments - MediCore Pro</title><link rel="stylesheet" href="css/style.css">
+  <style>.filters{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.filters input,.filters select{padding:10px;border:1px solid #d5e3d8;border-radius:8px}.table-scroll{overflow-x:auto}.table-scroll table{min-width:max-content}.status-pill{display:inline-block;padding:4px 9px;background:#eaf7ee;color:#176a3e;border-radius:999px;font-size:.85em}@media(max-width:768px){.filters{flex-direction:column}.filters input,.filters select{width:100%}}</style>
+</head>
+<body>
+<header><div class="nav-container"><a href="index.html" class="logo">MediCore<span>Pro</span></a><nav>
+  <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="patients.html">Patients</a><a href="doctors.html">Doctors</a><a href="appointments.html" class="active">Appointments</a><a href="visits.html">Visits</a><a href="reports.html">Reports</a>
+</nav></div></header>
+<main class="main-container">
+  <div class="page-heading"><div><h1 class="page-title">Appointments</h1><p>Schedule and track upcoming patient appointments.</p></div><button class="btn" id="add-btn" type="button">+ Add appointment</button></div>
+  <section class="card"><div class="filters"><input id="search" type="search" placeholder="Search patient or doctor" aria-label="Search appointments"><select id="status-filter" aria-label="Filter by status"><option value="">All statuses</option><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select></div>
+    <div class="table-scroll" role="region" aria-label="Appointments table"><table><thead><tr><th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div><p id="empty" class="empty-state" hidden>No matching appointments.</p>
+  </section>
+</main>
+<script src="js/app.js"></script>
+<script>
+const $=id=>document.getElementById(id);const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function getList(){const db=loadDB()||{};return Array.isArray(db.appointments)?db.appointments:[];}
+function render(){const q=$('search').value.trim().toLowerCase(),st=$('status-filter').value;const list=getList().map((a,i)=>({...a,_i:i})).filter(a=>(!st||a.status===st)&&(!q||`${a.patientName||a.patient||''} ${a.doctorName||a.doctor||''}`.toLowerCase().includes(q)));$('rows').innerHTML=list.map(a=>`<tr><td>${safe(a.date)}</td><td>${safe(a.time||'—')}</td><td>${safe(a.patientName||a.patient)}</td><td>${safe(a.doctorName||a.doctor)}</td><td>${safe(a.reason||'—')}</td><td><span class="status-pill">${safe(a.status||'Scheduled')}</span></td><td><button class="btn-small" type="button" data-done="${a._i}">Complete</button> <button class="btn-small" type="button" data-delete="${a._i}">Delete</button></td></tr>`).join('');$('empty').hidden=list.length>0;}
+$('add-btn').addEventListener('click',()=>{const patientName=prompt('Patient name:');if(!patientName)return;const doctorName=prompt('Doctor name:')||'Unassigned';const date=prompt('Appointment date (YYYY-MM-DD):',new Date().toISOString().slice(0,10));if(!date)return;const time=prompt('Appointment time:', '09:00')||'';const reason=prompt('Reason for visit:')||'';const db=loadDB()||{};db.appointments=Array.isArray(db.appointments)?db.appointments:[];db.appointments.unshift({patientName,doctorName,date,time,reason,status:'Scheduled'});saveDB(db);render();});
+$('rows').addEventListener('click',e=>{const db=loadDB()||{};db.appointments=Array.isArray(db.appointments)?db.appointments:[];if(e.target.dataset.done!==undefined){db.appointments[Number(e.target.dataset.done)].status='Completed';saveDB(db);render();}if(e.target.dataset.delete!==undefined&&confirm('Delete this appointment?')){db.appointments.splice(Number(e.target.dataset.delete),1);saveDB(db);render();}});$('search').addEventListener('input',render);$('status-filter').addEventListener('change',render);document.addEventListener('DOMContentLoaded',render);
+</script>
+</body></html>

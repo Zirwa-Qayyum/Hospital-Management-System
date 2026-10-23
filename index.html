@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediCore Pro - Hospital Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">🏥 MediCorePro</a>
+      <nav>
+        <a href="index.html" class="active">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="patients.html">Patients</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="visits.html">Visits</a>
+        <a href="tests.html">Diagnostics</a>
+        <a href="billing.html">Billing</a>
+        <a href="reports.html">Reports</a>
+        <a href="ai-chat.html">AI Chat</a>
+        <button class="btn-sample" id="load-sample-data" type="button">Load Sample Data</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero" style="background: linear-gradient(rgba(20,83,45,0.85), rgba(20,83,45,0.85)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1600&q=80') center/cover; color: white; padding: 100px 2rem; text-align: center;">
+    <div style="max-width: 800px; margin: 0 auto;">
+      <h1 style="font-size: 3rem; margin-bottom: 1rem; border: none; color: white;">Advanced Healthcare Management</h1>
+      <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">Streamline hospital operations, patient records, diagnostic reports, and AI-powered medical insights with a secure, lightning-fast platform.</p>
+      <a href="dashboard.html" class="btn" style="background: #22c55e; padding: 1rem 2rem; font-size: 1.1rem; text-decoration: none;">Open Executive Dashboard</a>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #14532d;">Core System Modules</h2>
+    <div class="grid-cards">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80" alt="Patients" style="width:100%; height:140px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3>Patient Directory</h3>
+        <p style="color:#4b5563; font-size:0.9rem; margin-bottom:1rem;">Manage patient profiles, demographics, medical histories, and contact records.</p>
+        <a href="patients.html" class="btn" style="display:inline-block; text-decoration:none; text-align:center;">View Patients</a>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80" alt="Doctors" style="width:100%; height:140px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3>Specialist Doctors</h3>
+        <p style="color:#4b5563; font-size:0.9rem; margin-bottom:1rem;">Department rosters, schedules, and physician assignments across specialties.</p>
+        <a href="doctors.html" class="btn" style="display:inline-block; text-decoration:none; text-align:center;">View Doctors</a>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80" alt="AI Chat" style="width:100%; height:140px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3>ChatterMate AI Assistant</h3>
+        <p style="color:#4b5563; font-size:0.9rem; margin-bottom:1rem;">Query patient reports, analytics, and clinical summaries instantly using your API key.</p>
+        <a href="ai-chat.html" class="btn" style="display:inline-block; text-decoration:none; text-align:center;">Launch AI Chat</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>🏥 MediCore Pro</h3>
+        <p>Next-generation hospital management, electronic health records, and AI clinical support platform.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="patients.html">Patients</a></li>
+          <li><a href="doctors.html">Doctors</a></li>
+          <li><a href="billing.html">Billing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>System Status</h4>
+        <p><span class="status-dot"></span> All Systems Operational</p>
+        <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 8px;">HIPAA &amp; GDPR Compliant Security</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 MediCore Pro Systems. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Keep this path aligned with your project folder structure. -->
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('load-sample-data').addEventListener('click', () => {
+      if (typeof generateSampleData !== 'function') {
+        alert('Sample data did not load. Check that js/app.js exists and defines generateSampleData().');
+        return;
+      }
+
+      try {
+        generateSampleData();
+      } catch (error) {
+        console.error('Sample data error:', error);
+        alert('Sample data could not be loaded. Open the browser console for details.');
+      }
+    });
+  </script>
+</body>
+</html>

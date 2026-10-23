@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patients - MediCore Pro</title>
+  <link rel="stylesheet" href="patients.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">🏥 MediCorePro</a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="patients.html" class="active">Patients</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="visits.html">Visits</a>
+        <a href="tests.html">Diagnostics</a>
+        <a href="billing.html">Billing</a>
+        <a href="reports.html">Reports</a>
+        <a href="ai-chat.html">AI Chat</a>
+        <button class="btn-sample" onclick="generateSampleData()">Load Sample Data</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h1 class="page-title" style="margin: 0;">Patient Directory</h1>
+      <button class="btn" onclick="openPatientModal()">+ Add Patient</button>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Phone</th>
+            <th>Primary Condition</th>
+          </tr>
+        </thead>
+        <tbody id="patient-table-body">
+          <tr><td colspan="6" style="text-align: center; color: #6b7280;">No patients loaded. Click "Load Sample Data" above.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>🏥 MediCore Pro</h3>
+        <p>Next-generation hospital management, electronic health records, and AI clinical support platform.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="patients.html">Patients</a></li>
+          <li><a href="doctors.html">Doctors</a></li>
+          <li><a href="billing.html">Billing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>System Status</h4>
+        <p><span class="status-dot"></span> All Systems Operational</p>
+        <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 8px;">HIPAA & GDPR Compliant Security</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 MediCore Pro Systems. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const db = loadDB();
+      const tbody = document.getElementById('patient-table-body');
+      if (db.patients.length > 0) {
+        tbody.innerHTML = db.patients.map(p => `
+          <tr>
+            <td style="font-weight: 600;">${p.id}</td>
+            <td>${p.name}</td>
+            <td>${p.age}</td>
+            <td>${p.gender}</td>
+            <td>${p.phone}</td>
+            <td><span style="background: #f0fdf4; color: #16a34a; padding: 4px 8px; border-radius: 4px; font-weight: 500;">${p.condition}</span></td>
+          </tr>
+        `).join('');
+      }
+    });
+
+    function openPatientModal() {
+      const name = prompt("Enter patient name:");
+      if (!name) return;
+      const age = prompt("Enter age:");
+      const gender = prompt("Enter gender (Male/Female):");
+      const phone = prompt("Enter phone number:");
+      const condition = prompt("Enter primary condition:");
+      
+      const db = loadDB();
+      const newPat = {
+        id: `PAT-${1000 + db.patients.length + 1}`,
+        name, age: Number(age) || 30, gender: gender || 'Other', phone: phone || '555-0199', condition: condition || 'Routine'
+      };
+      db.patients.unshift(newPat);
+      saveDB(db);
+      location.reload();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Report Chat - MediCore Pro</title>
+  <link rel="stylesheet" href="chat.css">
+  <style>
+    .chat-card{max-width:900px;margin:0 auto}.chat-log{height:390px;overflow:auto;padding:18px;background:#f6faf7;border:1px solid #e1ebe4;border-radius:14px;margin:16px 0}.message{max-width:82%;padding:12px 15px;border-radius:14px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}.message.user{margin-left:auto;background:#167447;color:#fff}.message.assistant{background:#fff;border:1px solid #e1ebe4;color:#18382a}.message.error{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.chat-form{display:flex;gap:10px}.chat-form input{flex:1;min-width:0}.hint{color:#607268;font-size:.9rem}.status{min-height:1.4em;color:#52675b}.quick-prompts{display:flex;gap:8px;flex-wrap:wrap}.quick-prompts button{border:1px solid #cfe2d4;background:#f2faf4;color:#176a3e;border-radius:999px;padding:8px 12px;cursor:pointer}.quick-prompts button:hover{background:#e1f3e5}.chat-form button:disabled{opacity:.65;cursor:wait}@media(max-width:768px){.chat-form{flex-direction:column}.chat-log{height:55vh}.message{max-width:94%}}
+  </style>
+</head>
+<body>
+  <header><div class="nav-container">
+    <a href="index.html" class="logo">MediCore<span>Pro</span></a>
+    <nav>
+      <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a>
+      <a href="patients.html">Patients</a><a href="doctors.html">Doctors</a>
+      <a href="visits.html">Visits</a><a href="tests.html">Diagnostics</a>
+      <a href="billing.html">Billing</a><a href="reports.html">Reports</a>
+      <a href="ai-chat.html" class="active">AI Chat</a>
+      <button class="btn-sample" type="button" onclick="generateSampleData();location.reload();">Load Sample Data</button>
+    </nav>
+  </div></header>
+
+  <main class="main-container">
+    <div class="page-heading">
+      <div>
+        <h1 class="page-title">AI Report Chat</h1>
+        <p>Ask ChatterMate AI questions about the sample or saved hospital data in this browser.</p>
+      </div>
+    </div>
+
+    <section class="card chat-card">
+      <p class="hint">Answers come from ChatterMate AI. This page sends aggregate report data from localStorage to your local backend at <code>http://localhost:3000/api/chat</code>. Keep your ChatterMate API key on the backend in an environment variable—never in this page.</p>
+
+      <div class="quick-prompts" aria-label="Suggested questions">
+        <button type="button" data-question="Summarize the current hospital records.">Summarize records</button>
+        <button type="button" data-question="How many visits are recorded by status?">Visits by status</button>
+        <button type="button" data-question="What is the total recorded payment amount?">Payment total</button>
+      </div>
+
+      <div id="chat-log" class="chat-log" aria-live="polite">
+        <div class="message assistant">Hello. I’ll send your report question and the current aggregate hospital data to ChatterMate AI. Load sample data first if you want to try the demo.</div>
+      </div>
+
+      <form id="chat-form" class="chat-form">
+        <input id="question" type="text" placeholder="Ask a report question…" required aria-label="Your report question">
+        <button class="btn" type="submit">Send</button>
+      </form>
+      <p id="chat-status" class="status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+
+    function getData() {
+      let d = {};
+      try {
+        d = typeof loadDB === 'function' ? (loadDB() || {}) : {};
+      } catch (error) {
+        console.error('Could not read hospital data from localStorage:', error);
+      }
+      return {
+        patients: Array.isArray(d.patients) ? d.patients : [],
+        doctors: Array.isArray(d.doctors) ? d.doctors : [],
+        visits: Array.isArray(d.visits) ? d.visits : [],
+        tests: Array.isArray(d.tests) ? d.tests : [],
+        payments: Array.isArray(d.payments) ? d.payments : Array.isArray(d.billing) ? d.billing : []
+      };
+    }
+
+    // Pass aggregate data only: no names, phone numbers, email addresses, or medical histories.
+    function buildReportContext() {
+      const d = getData();
+      const amountOf = item => Number(item.amount ?? item.total ?? 0) || 0;
+      const paymentsTotal = d.payments.reduce((sum, item) => sum + amountOf(item), 0);
+      const paidTotal = d.payments.reduce((sum, item) => {
+        const isPaid = String(item.status || '').toLowerCase() === 'paid';
+        return sum + (isPaid ? amountOf(item) : 0);
+      }, 0);
+      const visitsByStatus = d.visits.reduce((counts, visit) => {
+        const status = String(visit.status || 'Unspecified');
+        counts[status] = (counts[status] || 0) + 1;
+        return counts;
+      }, {});
+      const testsByStatus = d.tests.reduce((counts, test) => {
+        const status = String(test.status || 'Unspecified');
+        counts[status] = (counts[status] || 0) + 1;
+        return counts;
+      }, {});
+
+      return {
+        source: 'Browser localStorage demo data',
+        counts: {
+          patients: d.patients.length,
+          doctors: d.doctors.length,
+          visits: d.visits.length,
+          diagnosticTests: d.tests.length,
+          paymentRecords: d.payments.length
+        },
+        visitsByStatus,
+        testsByStatus,
+        payments: {
+          totalAmount: Number(paymentsTotal.toFixed(2)),
+          paidAmount: Number(paidTotal.toFixed(2)),
+          currency: 'USD'
+        }
+      };
+    }
+
+    function addMessage(role, text, isError = false) {
+      const element = document.createElement('div');
+      element.className = `message ${role}${isError ? ' error' : ''}`;
+      element.textContent = text;
+      $('chat-log').appendChild(element);
+      $('chat-log').scrollTop = $('chat-log').scrollHeight;
+    }
+
+    function extractAnswer(data) {
+      if (typeof data === 'string') return data.trim();
+      return data?.answer || data?.response || data?.reply || data?.output_text ||
+        data?.message?.content || data?.choices?.[0]?.message?.content || '';
+    }
+
+    async function askChatterMate(question) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      try {
+        const response = await fetch('http://localhost:3000/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            message: question,
+            context: buildReportContext(),
+            instructions: 'You are MediCore Pro report assistant powered by ChatterMate AI. Answer using only the aggregate report data supplied in context. Do not invent missing data, identify patients, reveal personal data, or provide medical advice. Explain when the available aggregate data cannot answer a question.'
+          })
+        });
+
+        const raw = await response.text();
+        let payload;
+        try { payload = raw ? JSON.parse(raw) : {}; }
+        catch (_) { payload = { answer: raw }; }
+
+        if (!response.ok) {
+          const detail = payload.error || payload.message || raw || response.statusText;
+          throw new Error(`Backend returned HTTP ${response.status}: ${detail}`);
+        }
+
+        const answer = extractAnswer(payload);
+        if (!answer) throw new Error('The backend responded, but returned no answer.');
+        return answer;
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          throw new Error('The request timed out after 30 seconds. Check that the backend and ChatterMate request are responding.');
+        }
+        if (error instanceof TypeError) {
+          throw new Error('Cannot reach http://localhost:3000/api/chat. Start your local backend with node server.js.');
+        }
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    $('chat-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const question = $('question').value.trim();
+      if (!question) return;
+
+      const context = buildReportContext();
+      if (Object.values(context.counts).every(count => count === 0)) {
+        $('chat-status').textContent = 'No sample or saved records found. Click “Load Sample Data” first; then ask ChatterMate AI.';
+        return;
+      }
+
+      addMessage('user', question);
+      $('question').value = '';
+      $('chat-status').textContent = 'Sending report data to ChatterMate AI…';
+      const sendButton = $('chat-form').querySelector('button');
+      sendButton.disabled = true;
+
+      try {
+        const answer = await askChatterMate(question);
+        addMessage('assistant', answer);
+        $('chat-status').textContent = 'Answered by ChatterMate AI.';
+      } catch (error) {
+        console.error('ChatterMate chat request failed:', error);
+        addMessage('assistant', `ChatterMate AI did not return an answer. ${error.message}`, true);
+        $('chat-status').textContent = 'AI connection failed. No local/fallback answer was generated.';
+      } finally {
+        sendButton.disabled = false;
+      }
+    });
+
+    document.querySelectorAll('[data-question]').forEach(button => {
+      button.addEventListener('click', () => {
+        $('question').value = button.dataset.question;
+        $('question').focus();
+      });
+    });
+  </script>
+</body>
+</html>

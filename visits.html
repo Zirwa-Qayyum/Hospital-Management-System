@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visits - MediCore Pro</title>
+  <link rel="stylesheet" href="visits.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">MediCore<span>Pro</span></a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="patients.html">Patients</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="visits.html" class="active">Visits</a>
+        <a href="tests.html">Diagnostics</a>
+        <a href="billing.html">Billing</a>
+        <a href="reports.html">Reports</a>
+        <a href="ai-chat.html">AI Chat</a>
+        <button class="btn-sample" type="button" onclick="generateSampleData(); location.reload();">Load Sample Data</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-heading">
+      <div><h1 class="page-title">Patient Visits</h1>
+        <p>Review appointments and add a visit record.</p></div>
+      <button class="btn" type="button" id="add-visit">+ Add Visit</button>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Visit ID</th><th>Date</th><th>Patient</th><th>Doctor</th><th>Reason</th><th>Status</th></tr></thead>
+        <tbody id="visit-rows"></tbody>
+      </table>
+      <p id="empty-state" class="empty-state" hidden>No visits found. Load sample data or add a visit.</p>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const text = value => String(value ?? '—');
+    const safe = value => text(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    function renderVisits() {
+      const db = loadDB();
+      const rows = Array.isArray(db.visits) ? db.visits : [];
+      document.getElementById('empty-state').hidden = rows.length > 0;
+      document.getElementById('visit-rows').innerHTML = rows.map((visit, index) => {
+        const id = visit.id || `VIS-${String(index + 1).padStart(4, '0')}`;
+        const patient = visit.patientName || visit.patient || visit.patientId;
+        const doctor = visit.doctorName || visit.doctor || visit.doctorId;
+        const date = visit.date || visit.visitDate;
+        const reason = visit.reason || visit.type || visit.notes;
+        const status = visit.status || 'Scheduled';
+        return `<tr><td>${safe(id)}</td><td>${safe(date)}</td><td>${safe(patient)}</td><td>${safe(doctor)}</td><td>${safe(reason)}</td><td>${safe(status)}</td></tr>`;
+      }).join('');
+    }
+    document.getElementById('add-visit').addEventListener('click', () => {
+      const patient = prompt('Patient name:'); if (!patient) return;
+      const doctor = prompt('Doctor name:') || 'Unassigned';
+      const reason = prompt('Visit reason:') || 'General consultation';
+      const date = prompt('Visit date (YYYY-MM-DD):', new Date().toISOString().slice(0, 10));
+      const db = loadDB(); db.visits = Array.isArray(db.visits) ? db.visits : [];
+      db.visits.unshift({ id: `VIS-${Date.now()}`, date: date || new Date().toISOString().slice(0, 10), patient, doctor, reason, status: 'Scheduled' });
+      saveDB(db); renderVisits();
+    });
+    document.addEventListener('DOMContentLoaded', renderVisits);
+  </script>
+</body>
+</html>

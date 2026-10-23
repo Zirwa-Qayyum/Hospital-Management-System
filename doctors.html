@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Doctors - MediCore Pro</title>
+  <link rel="stylesheet" href="doctors.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">🏥 MediCorePro</a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="patients.html">Patients</a>
+        <a href="doctors.html" class="active">Doctors</a>
+        <a href="visits.html">Visits</a>
+        <a href="tests.html">Diagnostics</a>
+        <a href="billing.html">Billing</a>
+        <a href="reports.html">Reports</a>
+        <a href="ai-chat.html">AI Chat</a>
+        <button class="btn-sample" onclick="generateSampleData()">Load Sample Data</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h1 class="page-title" style="margin: 0;">Specialist Physicians</h1>
+      <button class="btn" onclick="openDoctorModal()">+ Add Doctor</button>
+    </div>
+
+    <div class="grid-cards" id="doctor-grid">
+      <!-- Fallback / Initial Static Doctor Cards -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=80" alt="Doctor" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3 style="color: #14532d; font-size: 1.1rem; text-transform: none;">Dr. Sarah Jenkins, MD</h3>
+        <p style="color: #16a34a; font-weight: 600; margin-bottom: 0.5rem;">Cardiology</p>
+        <p style="color: #4b5563; font-size: 0.9rem;">Email: s.jenkins@medicore.com</p>
+        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">ID: DOC-101</p>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80" alt="Doctor" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3 style="color: #14532d; font-size: 1.1rem; text-transform: none;">Dr. Robert Chen, PhD</h3>
+        <p style="color: #16a34a; font-weight: 600; margin-bottom: 0.5rem;">Neurology</p>
+        <p style="color: #4b5563; font-size: 0.9rem;">Email: r.chen@medicore.com</p>
+        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">ID: DOC-102</p>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=400&q=80" alt="Doctor" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3 style="color: #14532d; font-size: 1.1rem; text-transform: none;">Dr. Emily Vance, MD</h3>
+        <p style="color: #16a34a; font-weight: 600; margin-bottom: 0.5rem;">Pediatrics</p>
+        <p style="color: #4b5563; font-size: 0.9rem;">Email: e.vance@medicore.com</p>
+        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">ID: DOC-103</p>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1594824813567-27b2a95e6f3e?auto=format&fit=crop&w=400&q=80" alt="Doctor" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3 style="color: #14532d; font-size: 1.1rem; text-transform: none;">Dr. Marcus Brody, MD</h3>
+        <p style="color: #16a34a; font-weight: 600; margin-bottom: 0.5rem;">Orthopedic Surgery</p>
+        <p style="color: #4b5563; font-size: 0.9rem;">Email: m.brody@medicore.com</p>
+        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">ID: DOC-104</p>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1527613426441-2da17477ef66?auto=format&fit=crop&w=400&q=80" alt="Doctor" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3 style="color: #14532d; font-size: 1.1rem; text-transform: none;">Dr. Alisha Patel, MBBS</h3>
+        <p style="color: #16a34a; font-weight: 600; margin-bottom: 0.5rem;">Dermatology</p>
+        <p style="color: #4b5563; font-size: 0.9rem;">Email: a.patel@medicore.com</p>
+        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">ID: DOC-105</p>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=400&q=80" alt="Doctor" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+        <h3 style="color: #14532d; font-size: 1.1rem; text-transform: none;">Dr. David Kim, MD</h3>
+        <p style="color: #16a34a; font-weight: 600; margin-bottom: 0.5rem;">Oncology</p>
+        <p style="color: #4b5563; font-size: 0.9rem;">Email: d.kim@medicore.com</p>
+        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">ID: DOC-106</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Professional Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>🏥 MediCore Pro</h3>
+        <p>Next-generation hospital management, electronic health records, and AI clinical support platform.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="patients.html">Patients</a></li>
+          <li><a href="doctors.html">Doctors</a></li>
+          <li><a href="billing.html">Billing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>System Status</h4>
+        <p><span class="status-dot"></span> All Systems Operational</p>
+        <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 8px;">HIPAA & GDPR Compliant Security</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 MediCore Pro Systems. All rights reserved.</p>
+    </div>
+  </footer>
+
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const db = loadDB();
+      const container = document.getElementById('doctor-grid');
+      if (db.doctors && db.doctors.length > 0) {
+        container.innerHTML = db.doctors.map(doc => `
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=80" alt="Doctor" style="width:100%; height:160px; object-fit:cover; border-radius:6px; margin-bottom:1rem;">
+            <h3 style="color: #14532d; font-size: 1.1rem; text-transform: none;">${doc.name}</h3>
+            <p style="color: #16a34a; font-weight: 600; margin-bottom: 0.5rem;">${doc.dept}</p>
+            <p style="color: #4b5563; font-size: 0.9rem;">Email: ${doc.email}</p>
+            <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;">ID: ${doc.id}</p>
+          </div>
+        `).join('');
+      }
+    });
+
+    function openDoctorModal() {
+      const name = prompt("Enter doctor name (e.g. Dr. Jane Doe):");
+      if (!name) return;
+      const dept = prompt("Enter department/specialty:");
+      const email = prompt("Enter email address:");
+      
+      const db = loadDB();
+      if (!db.doctors) db.doctors = [];
+      const newDoc = {
+        id: `DOC-${101 + db.doctors.length}`,
+        name,
+        dept: dept || 'General Medicine',
+        email: email || `${name.toLowerCase().replace(/[^a-z]/g, '')}@medicore.com`
+      };
+      db.doctors.unshift(newDoc);
+      saveDB(db);
+      location.reload();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Billing - MediCore Pro</title>
+  <link rel="stylesheet" href="billing.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">MediCore<span>Pro</span></a>
+      <nav>
+        <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a>
+        <a href="patients.html">Patients</a><a href="doctors.html">Doctors</a>
+        <a href="visits.html">Visits</a><a href="tests.html">Diagnostics</a>
+        <a href="billing.html" class="active">Billing</a><a href="reports.html">Reports</a>
+        <a href="ai-chat.html">AI Chat</a>
+        <button class="btn-sample" type="button" onclick="generateSampleData(); location.reload();">Load Sample Data</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-heading">
+      <div><h1 class="page-title">Billing & Payments</h1><p>Track payment records saved in this browser.</p></div>
+      <button class="btn" type="button" id="add-payment">+ Add Payment</button>
+    </div>
+    <div class="grid-cards">
+      <article class="card"><p>Total recorded</p><h2 id="total-paid">$0.00</h2></article>
+      <article class="card"><p>Payments</p><h2 id="payment-count">0</h2></article>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Payment ID</th><th>Date</th><th>Patient</th><th>Description</th><th>Method</th><th>Amount</th></tr></thead>
+        <tbody id="payment-rows"></tbody>
+      </table>
+      <p id="empty-state" class="empty-state" hidden>No payments found. Load sample data or add a payment.</p>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const money = amount => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(amount) || 0);
+    const escapeHTML = value => String(value ?? '—').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    function renderPayments() {
+      const db = loadDB();
+      const payments = Array.isArray(db.payments) ? db.payments : (Array.isArray(db.billing) ? db.billing : []);
+      const total = payments.reduce((sum, payment) => sum + Number(payment.amount || payment.total || 0), 0);
+      document.getElementById('total-paid').textContent = money(total);
+      document.getElementById('payment-count').textContent = payments.length;
+      document.getElementById('empty-state').hidden = payments.length > 0;
+      document.getElementById('payment-rows').innerHTML = payments.map((payment, index) => {
+        const id = payment.id || `PAY-${String(index + 1).padStart(4, '0')}`;
+        const patient = payment.patientName || payment.patient || payment.patientId;
+        const date = payment.date || payment.paymentDate;
+        const description = payment.description || payment.service || payment.type || 'Hospital service';
+        const method = payment.method || payment.paymentMethod || '—';
+        return `<tr><td>${escapeHTML(id)}</td><td>${escapeHTML(date)}</td><td>${escapeHTML(patient)}</td><td>${escapeHTML(description)}</td><td>${escapeHTML(method)}</td><td>${money(payment.amount || payment.total)}</td></tr>`;
+      }).join('');
+    }
+    document.getElementById('add-payment').addEventListener('click', () => {
+      const patient = prompt('Patient name:'); if (!patient) return;
+      const amount = Number(prompt('Amount in dollars:'));
+      if (!Number.isFinite(amount) || amount <= 0) { alert('Enter an amount greater than zero.'); return; }
+      const description = prompt('Payment description:', 'Consultation') || 'Hospital service';
+      const method = prompt('Payment method:', 'Card') || 'Other';
+      const db = loadDB(); db.payments = Array.isArray(db.payments) ? db.payments : [];
+      db.payments.unshift({ id: `PAY-${Date.now()}`, date: new Date().toISOString().slice(0, 10), patient, description, method, amount });
+      saveDB(db); renderPayments();
+    });
+    document.addEventListener('DOMContentLoaded', renderPayments);
+  </script>
+</body>
+</html>
