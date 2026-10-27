@@ -6,21 +6,66 @@
   <title>AI Report Chat - MediCore Pro</title>
   <link rel="stylesheet" href="chat.css">
   <style>
-    .chat-card{max-width:900px;margin:0 auto}.chat-log{height:390px;overflow:auto;padding:18px;background:#f6faf7;border:1px solid #e1ebe4;border-radius:14px;margin:16px 0}.message{max-width:82%;padding:12px 15px;border-radius:14px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}.message.user{margin-left:auto;background:#167447;color:#fff}.message.assistant{background:#fff;border:1px solid #e1ebe4;color:#18382a}.message.error{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.chat-form{display:flex;gap:10px}.chat-form input{flex:1;min-width:0}.hint{color:#607268;font-size:.9rem}.status{min-height:1.4em;color:#52675b}.quick-prompts{display:flex;gap:8px;flex-wrap:wrap}.quick-prompts button{border:1px solid #cfe2d4;background:#f2faf4;color:#176a3e;border-radius:999px;padding:8px 12px;cursor:pointer}.quick-prompts button:hover{background:#e1f3e5}.chat-form button:disabled{opacity:.65;cursor:wait}@media(max-width:768px){.chat-form{flex-direction:column}.chat-log{height:55vh}.message{max-width:94%}}
+    .chat-card{max-width:900px;margin:0 auto}
+    .chat-log{height:390px;overflow:auto;padding:18px;background:#f6faf7;border:1px solid #e1ebe4;border-radius:14px;margin:16px 0}
+    .message{max-width:82%;padding:12px 15px;border-radius:14px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+    .message.user{margin-left:auto;background:#167447;color:#fff}
+    .message.assistant{background:#fff;border:1px solid #e1ebe4;color:#18382a}
+    .message.error{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+    .chat-form{display:flex;gap:10px}
+    .chat-form input{flex:1;min-width:0}
+    .hint{color:#607268;font-size:.9rem}
+    .status{min-height:1.4em;color:#52675b}
+    .quick-prompts{display:flex;gap:8px;flex-wrap:wrap}
+    .quick-prompts button{border:1px solid #cfe2d4;background:#f2faf4;color:#176a3e;border-radius:999px;padding:8px 12px;cursor:pointer}
+    .quick-prompts button:hover{background:#e1f3e5}
+    .chat-form button:disabled{opacity:.65;cursor:wait}
+    .settings-button{display:inline-flex;align-items:center;gap:7px;border:1px solid #cfe2d4;background:#f2faf4;color:#14532d;border-radius:8px;padding:7px 12px;font:inherit;font-weight:600;cursor:pointer}
+    .settings-button:hover{background:#e1f3e5}
+    .settings-button .gear{font-size:1rem;line-height:1}
+    .settings-modal{width:min(460px,calc(100% - 32px));border:1px solid #d8e6dc;border-radius:16px;padding:0;color:#18382a;box-shadow:0 24px 70px rgba(12,48,28,.24)}
+    .settings-modal::backdrop{background:rgba(12,35,22,.52);backdrop-filter:blur(3px)}
+    .settings-panel{padding:24px}
+    .settings-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .settings-heading h2{color:#14532d;font-size:1.35rem;margin:0}
+    .settings-heading p{color:#607268;font-size:.92rem;margin:6px 0 0}
+    .settings-close{border:0;background:transparent;color:#52675b;font-size:1.5rem;line-height:1;cursor:pointer;padding:2px 5px}
+    .settings-field{display:grid;gap:7px;margin:18px 0}
+    .settings-field label{font-size:.92rem;font-weight:650;color:#244533}
+    .settings-field input{width:100%;padding:11px 12px;border:1px solid #cbd9cf;border-radius:9px;font:inherit;color:#18382a;background:#fff}
+    .settings-field input:focus{outline:3px solid #bbf7d0;border-color:#16834b}
+    .settings-note{font-size:.82rem;line-height:1.5;color:#607268;margin:0 0 18px}
+    .settings-actions{display:flex;justify-content:flex-end;gap:10px}
+    .settings-actions button{font:inherit;font-weight:600;border-radius:8px;padding:9px 14px;cursor:pointer}
+    .settings-cancel{border:1px solid #d4e0d7;background:#fff;color:#31513d}
+    .settings-save{border:1px solid #14532d;background:#14532d;color:#fff}
+    .settings-save:hover{background:#166534}
+    .settings-feedback{min-height:1.2em;color:#176a3e;font-size:.88rem;margin-top:12px}
+    @media(max-width:900px){.nav-container{height:auto;min-height:76px;padding:14px 20px;flex-wrap:wrap;gap:12px}nav{justify-content:center}}
+    @media(max-width:768px){.chat-form{flex-direction:column}.chat-log{height:55vh}.message{max-width:94%}.settings-panel{padding:20px}.settings-actions{flex-direction:column-reverse}.settings-actions button{width:100%}}
   </style>
 </head>
 <body>
-  <header><div class="nav-container">
-    <a href="index.html" class="logo">MediCore<span>Pro</span></a>
-    <nav>
-      <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a>
-      <a href="patients.html">Patients</a><a href="doctors.html">Doctors</a>
-      <a href="visits.html">Visits</a><a href="tests.html">Diagnostics</a>
-      <a href="billing.html">Billing</a><a href="reports.html">Reports</a>
-      <a href="ai-chat.html" class="active">AI Chat</a>
-      <button class="btn-sample" type="button" onclick="generateSampleData();location.reload();">Load Sample Data</button>
-    </nav>
-  </div></header>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">MediCore<span>Pro</span></a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="patients.html">Patients</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="visits.html">Visits</a>
+        <a href="tests.html">Diagnostics</a>
+        <a href="billing.html">Billing</a>
+        <a href="reports.html">Reports</a>
+        <a href="ai-chat.html" class="active">AI Chat</a>
+        <button class="btn-sample" type="button" onclick="generateSampleData();location.reload();">Load Sample Data</button>
+        <button class="settings-button" type="button" id="open-settings" aria-haspopup="dialog" aria-controls="settings-modal">
+          <span class="gear" aria-hidden="true">⚙</span> Settings
+        </button>
+      </nav>
+    </div>
+  </header>
 
   <main class="main-container">
     <div class="page-heading">
@@ -31,7 +76,7 @@
     </div>
 
     <section class="card chat-card">
-      <p class="hint">Answers come from ChatterMate AI. This page sends aggregate report data from localStorage to your local backend at <code>http://localhost:3000/api/chat</code>. Keep your ChatterMate API key on the backend in an environment variable—never in this page.</p>
+      <p class="hint">Your question and aggregate report data are sent to the local MediCore backend. A key saved in this browser is sent to the backend first; if it is not set, the backend can use its server-side environment key. Avoid storing production secrets in browser localStorage.</p>
 
       <div class="quick-prompts" aria-label="Suggested questions">
         <button type="button" data-question="Summarize the current hospital records.">Summarize records</button>
@@ -40,7 +85,7 @@
       </div>
 
       <div id="chat-log" class="chat-log" aria-live="polite">
-        <div class="message assistant">Hello. I’ll send your report question and the current aggregate hospital data to ChatterMate AI. Load sample data first if you want to try the demo.</div>
+        <div class="message assistant">Hello. I’ll send your report question and aggregate hospital data to ChatterMate AI. Load sample data first if you want to try the demo.</div>
       </div>
 
       <form id="chat-form" class="chat-form">
@@ -51,9 +96,62 @@
     </section>
   </main>
 
+  <dialog id="settings-modal" class="settings-modal" aria-labelledby="settings-title">
+    <form id="settings-form" class="settings-panel">
+      <div class="settings-heading">
+        <div>
+          <h2 id="settings-title">Settings</h2>
+          <p>Set the API key for AI report chat.</p>
+        </div>
+        <button class="settings-close" type="button" id="close-settings" aria-label="Close settings">×</button>
+      </div>
+      <div class="settings-field">
+        <label for="api-key-input">Enter your API Key</label>
+        <input id="api-key-input" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your API key">
+      </div>
+      <p class="settings-note">The key is saved in this browser as <code>api_key</code>. For a deployed website, keep private API keys on the backend instead.</p>
+      <div class="settings-actions">
+        <button class="settings-cancel" type="button" id="cancel-settings">Cancel</button>
+        
+      </div>
+      <p id="settings-feedback" class="settings-feedback" role="status" aria-live="polite"></p>
+    </form>
+  </dialog>
+
   <script src="app.js"></script>
   <script>
     const $ = id => document.getElementById(id);
+    const settingsModal = $('settings-modal');
+    const API_PROXY_URL = 'http://127.0.0.1:3000/api/chat';
+    const API_HEALTH_URL = 'http://127.0.0.1:3000/health';
+
+    function openSettings() {
+      $('api-key-input').value = localStorage.getItem('api_key') || '';
+      $('settings-feedback').textContent = '';
+      if (!settingsModal.open) settingsModal.showModal();
+      $('api-key-input').focus();
+    }
+
+    function closeSettings() {
+      if (settingsModal.open) settingsModal.close();
+    }
+
+    $('open-settings').addEventListener('click', openSettings);
+    $('close-settings').addEventListener('click', closeSettings);
+    $('cancel-settings').addEventListener('click', closeSettings);
+
+    $('settings-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const key = $('api-key-input').value.trim();
+      if (!key) {
+        localStorage.removeItem('api_key');
+        $('settings-feedback').textContent = 'Browser API key removed. The backend environment key may be used instead.';
+      } else {
+        localStorage.setItem('api_key', key);
+        $('settings-feedback').textContent = 'API key saved in this browser.';
+      }
+      setTimeout(closeSettings, 650);
+    });
 
     function getData() {
       let d = {};
@@ -71,15 +169,12 @@
       };
     }
 
-    // Pass aggregate data only: no names, phone numbers, email addresses, or medical histories.
+    // Only aggregate data is sent; patient names, phone numbers, and emails are excluded.
     function buildReportContext() {
       const d = getData();
       const amountOf = item => Number(item.amount ?? item.total ?? 0) || 0;
       const paymentsTotal = d.payments.reduce((sum, item) => sum + amountOf(item), 0);
-      const paidTotal = d.payments.reduce((sum, item) => {
-        const isPaid = String(item.status || '').toLowerCase() === 'paid';
-        return sum + (isPaid ? amountOf(item) : 0);
-      }, 0);
+      const paidTotal = d.payments.reduce((sum, item) => sum + (String(item.status || '').toLowerCase() === 'paid' ? amountOf(item) : 0), 0);
       const visitsByStatus = d.visits.reduce((counts, visit) => {
         const status = String(visit.status || 'Unspecified');
         counts[status] = (counts[status] || 0) + 1;
@@ -90,7 +185,6 @@
         counts[status] = (counts[status] || 0) + 1;
         return counts;
       }, {});
-
       return {
         source: 'Browser localStorage demo data',
         counts: {
@@ -127,18 +221,21 @@
     async function askChatterMate(question) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const headers = { 'Content-Type': 'application/json' };
+      const browserApiKey = localStorage.getItem('api_key');
+      if (browserApiKey) headers['x-api-key'] = browserApiKey;
+
       try {
-        const response = await fetch('http://localhost:3000/api/chat', {
+        const response = await fetch(API_PROXY_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           signal: controller.signal,
           body: JSON.stringify({
             message: question,
             context: buildReportContext(),
-            instructions: 'You are MediCore Pro report assistant powered by ChatterMate AI. Answer using only the aggregate report data supplied in context. Do not invent missing data, identify patients, reveal personal data, or provide medical advice. Explain when the available aggregate data cannot answer a question.'
+            instructions: 'You are MediCore Pro report assistant powered by ChatterMate AI. Answer only from the supplied aggregate report data. Do not invent missing data, identify patients, reveal personal data, or provide medical advice. State clearly when the data cannot answer a question.'
           })
         });
-
         const raw = await response.text();
         let payload;
         try { payload = raw ? JSON.parse(raw) : {}; }
@@ -148,17 +245,12 @@
           const detail = payload.error || payload.message || raw || response.statusText;
           throw new Error(`Backend returned HTTP ${response.status}: ${detail}`);
         }
-
         const answer = extractAnswer(payload);
-        if (!answer) throw new Error('The backend responded, but returned no answer.');
+        if (!answer) throw new Error('The backend responded but returned no answer.');
         return answer;
       } catch (error) {
-        if (error.name === 'AbortError') {
-          throw new Error('The request timed out after 30 seconds. Check that the backend and ChatterMate request are responding.');
-        }
-        if (error instanceof TypeError) {
-          throw new Error('Cannot reach http://localhost:3000/api/chat. Start your local backend with node server.js.');
-        }
+        if (error.name === 'AbortError') throw new Error('The request timed out after 30 seconds. Check the backend and ChatterMate connection.');
+        if (error instanceof TypeError) throw new Error(`Cannot reach ${API_PROXY_URL}. Start the backend and verify its CORS settings.`);
         throw error;
       } finally {
         clearTimeout(timeoutId);
@@ -172,7 +264,7 @@
 
       const context = buildReportContext();
       if (Object.values(context.counts).every(count => count === 0)) {
-        $('chat-status').textContent = 'No sample or saved records found. Click “Load Sample Data” first; then ask ChatterMate AI.';
+        $('chat-status').textContent = 'No sample or saved records found. Click “Load Sample Data” first.';
         return;
       }
 
@@ -189,7 +281,7 @@
       } catch (error) {
         console.error('ChatterMate chat request failed:', error);
         addMessage('assistant', `ChatterMate AI did not return an answer. ${error.message}`, true);
-        $('chat-status').textContent = 'AI connection failed. No local/fallback answer was generated.';
+        $('chat-status').textContent = 'AI connection failed. Check the backend terminal for details.';
       } finally {
         sendButton.disabled = false;
       }
@@ -201,6 +293,21 @@
         $('question').focus();
       });
     });
+
+    // Browser JavaScript cannot inspect server .env. The backend health route
+    // should return { apiKeyConfigured: true } when its environment key exists.
+    async function checkApiKeySetup() {
+      if (localStorage.getItem('api_key')) return;
+      try {
+        const response = await fetch(API_HEALTH_URL);
+        const health = await response.json();
+        if (health.apiKeyConfigured !== true) openSettings();
+      } catch (_) {
+        openSettings();
+      }
+    }
+
+    checkApiKeySetup();
   </script>
 </body>
 </html>
